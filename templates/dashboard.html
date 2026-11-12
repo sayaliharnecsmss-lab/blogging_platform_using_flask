@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}My dashboard{% endblock %}
+{% block content %}
+<section class="dashboard-section">
+  <div class="container dashboard-container">
+    <div class="dashboard-heading">
+      <div><span class="eyebrow">YOUR LITTLE CORNER</span><h1>Welcome back,<br><em>{{ current_user.name }}.</em></h1><p>Your stories, all in one place.</p></div>
+      <a class="btn btn-ink" href="{{ url_for('posts.create_post') }}">Write a new story <span aria-hidden="true">↗</span></a>
+    </div>
+    <div class="dashboard-stats"><div><strong>{{ posts|length }}</strong><span>{{ 'story' if posts|length == 1 else 'stories' }} published</span></div><div><strong>{{ current_user.comments|length }}</strong><span>{{ 'note' if current_user.comments|length == 1 else 'notes' }} shared</span></div></div>
+    <div class="dashboard-list-heading"><h2>Your stories</h2><a href="{{ url_for('posts.index') }}">Explore all stories <span aria-hidden="true">↗</span></a></div>
+    {% if posts %}
+      <div class="dashboard-post-list">
+        {% for post in posts %}
+          <article class="dashboard-post">
+            <div class="dashboard-post-cover cover-{{ loop.index0 % 4 }}"><span>{{ ['✳', '◒', '✿', '✦'][loop.index0 % 4] }}</span></div>
+            <div class="dashboard-post-info"><span class="story-meta">{{ post.category.name }} <span class="meta-dot">·</span> {{ post.created_at.strftime("%b %d, %Y") }}</span><h3><a href="{{ url_for('posts.detail', post_id=post.id) }}">{{ post.title }}</a></h3><p>{{ post.body|striptags|truncate(110) }}</p><span class="dashboard-comment-count">{{ post.comments|length }} {{ 'note' if post.comments|length == 1 else 'notes' }}</span></div>
+            <div class="dashboard-post-actions"><a class="btn btn-outline-ink btn-sm" href="{{ url_for('posts.edit_post', post_id=post.id) }}">Edit</a><form method="post" action="{{ url_for('posts.delete_post', post_id=post.id) }}" data-confirm="Delete this story? This cannot be undone."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-danger btn-sm" type="submit">Delete</button></form></div>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state dashboard-empty"><span class="empty-spark">✳</span><h3>Your first story is waiting.</h3><p>Pick up an idea and turn it into something worth sharing.</p><a class="btn btn-ink" href="{{ url_for('posts.create_post') }}">Write your first story <span aria-hidden="true">↗</span></a></div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

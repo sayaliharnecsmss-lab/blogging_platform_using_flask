@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}{{ post.title }}{% endblock %}
+{% block content %}
+<section class="article-section">
+  <div class="container article-container">
+    <a class="back-link" href="{{ url_for('posts.index') }}">← &nbsp; Back to stories</a>
+    <div class="article-heading">
+      <a class="article-category" href="{{ url_for('posts.index', category=post.category.id) }}">{{ post.category.name }}</a>
+      <h1>{{ post.title }}</h1>
+      <div class="article-byline"><span class="author-avatar">{{ post.author.name[:1]|upper }}</span><span>By <strong>{{ post.author.name }}</strong></span><span class="meta-dot">·</span><time datetime="{{ post.created_at.isoformat() }}">{{ post.created_at.strftime("%B %d, %Y") }}</time></div>
+      {% if current_user.is_authenticated and current_user.id == post.author_id %}
+        <div class="article-actions"><a class="btn btn-outline-ink btn-sm" href="{{ url_for('posts.edit_post', post_id=post.id) }}">Edit story</a><form method="post" action="{{ url_for('posts.delete_post', post_id=post.id) }}" data-confirm="Delete this story? This cannot be undone."><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="btn btn-outline-danger btn-sm" type="submit">Delete story</button></form></div>
+      {% endif %}
+    </div>
+    <div class="article-cover cover-{{ post.id % 4 }}"><span class="cover-label">{{ post.category.name }}</span><span class="cover-symbol" aria-hidden="true">{{ ['✳', '◒', '✿', '✦'][post.id % 4] }}</span><span class="cover-index">A STORY BY {{ post.author.name|upper }}</span></div>
+    <article class="article-body">{{ post.body }}</article>
+    <section class="comments-section" id="comments">
+      <div class="comments-heading"><h2>Notes from readers <span>{{ post.comments|length }}</span></h2><p>Good conversations make good stories even better.</p></div>
+      {% if current_user.is_authenticated %}
+        <form class="comment-form" method="post" action="{{ url_for('posts.add_comment', post_id=post.id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <label for="comment-body" class="form-label">Leave a thoughtful note</label>
+          <textarea id="comment-body" name="body" rows="3" maxlength="1000" required placeholder="What did this story make you think about?"></textarea>
+          <div class="form-footer"><span>Be kind. Stay curious.</span><button class="btn btn-ink btn-sm" type="submit">Post comment <span aria-hidden="true">↗</span></button></div>
+        </form>
+      {% else %}
+        <div class="comment-signin"><p>Want to join the conversation?</p><a class="text-link" href="{{ url_for('auth.login', next=url_for('posts.detail', post_id=post.id) + '#comments') }}">Log in to leave a note ↗</a></div>
+      {% endif %}
+      <div class="comment-list">
+        {% for comment in post.comments %}
+          <article class="comment-card"><span class="author-avatar">{{ comment.author.name[:1]|upper }}</span><div class="comment-content"><div class="comment-meta"><strong>{{ comment.author.name }}</strong><time datetime="{{ comment.created_at.isoformat() }}">{{ comment.created_at.strftime("%b %d, %Y") }}</time></div><p>{{ comment.body }}</p></div></article>
+        {% else %}
+          <p class="no-comments">No notes yet. Be the first to share a thought.</p>
+        {% endfor %}
+      </div>
+    </section>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit story' if post else 'Write a story' }}{% endblock %}
+{% block content %}
+<section class="form-page">
+  <div class="container form-page-container">
+    <a class="back-link" href="{{ url_for('posts.dashboard') }}">← &nbsp; Back to your dashboard</a>
+    <div class="form-page-heading"><span class="eyebrow">{{ 'POLISH YOUR WORDS' if post else 'MAKE SOMETHING YOURS' }}</span><h1>{{ 'A little edit.' if post else 'A story begins.' }}</h1><p>{{ 'Every good story gets even better with a second look.' if post else 'Take a breath, follow that thought, and see where it goes.' }}</p></div>
+    <form class="editor-form" method="post">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+      <label class="form-label" for="title">Give your story a title</label>
+      <input class="form-control title-input" id="title" name="title" type="text" maxlength="160" required placeholder="A title that says a little something..." value="{{ post.title if post else '' }}">
+      <div class="editor-label-row"><label class="form-label" for="body">Your story</label><span>A little or a lot — it's yours.</span></div>
+      <textarea class="form-control editor-body" id="body" name="body" rows="14" required placeholder="It started with a thought...">{{ post.body if post else '' }}</textarea>
+      <label class="form-label" for="category_id">Choose a category</label>
+      <select class="form-select category-select" id="category_id" name="category_id" required>
+        <option value="">Pick the best fit</option>
+        {% for category in categories %}<option value="{{ category.id }}" {{ 'selected' if post and post.category_id == category.id else '' }}>{{ category.name }}</option>{% endfor %}
+      </select>
+      <div class="editor-footer"><span>✳ &nbsp; Your story will be visible to everyone once published.</span><div><a class="btn btn-link-ink" href="{{ url_for('posts.dashboard') }}">Cancel</a><button class="btn btn-ink" type="submit">{{ 'Save changes' if post else 'Publish story' }} <span aria-hidden="true">↗</span></button></div></div>
+    </form>
+  </div>
+</section>
+{% endblock %}

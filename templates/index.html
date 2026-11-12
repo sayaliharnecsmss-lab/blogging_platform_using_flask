@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Stories for curious minds{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container hero-inner">
+    <div class="hero-copy">
+      <span class="eyebrow"><span class="eyebrow-dot"></span> A community of curious minds</span>
+      <h1>Ideas are better<br>when they're <em>shared.</em></h1>
+      <p class="hero-description">Thoughtful stories, fresh perspectives, and the little things that make us think. Find your next favorite read.</p>
+      <div class="hero-actions">
+        <a class="btn btn-ink" href="#stories">Explore the stories <span aria-hidden="true">↓</span></a>
+        {% if current_user.is_authenticated %}
+          <a class="text-link" href="{{ url_for('posts.create_post') }}">Have something to say? <span aria-hidden="true">↗</span></a>
+        {% else %}
+          <a class="text-link" href="{{ url_for('auth.register') }}">Start writing <span aria-hidden="true">↗</span></a>
+        {% endif %}
+      </div>
+      <div class="hero-note"><span class="note-stars">✳ ✳ ✳</span><span>Written by people, for people.</span></div>
+    </div>
+    <div class="hero-art" aria-hidden="true">
+      <div class="art-sun"></div><div class="art-orbit orbit-one"></div><div class="art-orbit orbit-two"></div>
+      <div class="art-card card-back"><span>FIELD NOTES</span><i>Ideas need<br>room to grow.</i><b>✳</b></div>
+      <div class="art-card card-front"><span>VOL. 01 &nbsp;·&nbsp; THE DAILY</span><strong>Words<br>with a little<br><em>more feeling.</em></strong><div class="art-card-bottom"><span>Read. Reflect. Repeat.</span><span>✦</span></div></div>
+      <span class="art-scribble">take your<br>time ↗</span><span class="art-flower">✳</span>
+    </div>
+  </div>
+  <div class="hero-ticker"><div class="ticker-track"><span>GOOD STORIES STAY WITH YOU <i>✳</i> IDEAS ARE MEANT TO TRAVEL <i>✳</i> MAKE ROOM FOR A NEW PERSPECTIVE <i>✳</i> GOOD STORIES STAY WITH YOU <i>✳</i> IDEAS ARE MEANT TO TRAVEL <i>✳</i></span></div></div>
+</section>
+<section class="stories-section" id="stories">
+  <div class="container">
+    <div class="section-heading">
+      <div><span class="eyebrow">THE READING ROOM</span><h2>Stories worth<br class="mobile-break"> your <em>time.</em></h2></div>
+      <p>Little sparks of inspiration, from one curious mind to another.</p>
+    </div>
+    <form class="search-form" method="get" action="{{ url_for('posts.index') }}" role="search">
+      <label class="visually-hidden" for="search-query">Search stories</label>
+      <span class="search-icon" aria-hidden="true">⌕</span>
+      <input id="search-query" type="search" name="q" value="{{ query }}" placeholder="Find a story, a thought, a feeling...">
+      {% if selected_category %}<input type="hidden" name="category" value="{{ selected_category }}">{% endif %}
+      <button type="submit" class="btn btn-ink">Search <span aria-hidden="true">↗</span></button>
+    </form>
+    <div class="category-row" aria-label="Filter stories by category">
+      <a class="category-pill {{ 'active' if not selected_category else '' }}" href="{{ url_for('posts.index', q=query or None) }}">All stories</a>
+      {% for category in categories %}
+        <a class="category-pill {{ 'active' if selected_category == category.id else '' }}" href="{{ url_for('posts.index', category=category.id, q=query or None) }}">{{ category.name }}</a>
+      {% endfor %}
+    </div>
+    {% if posts %}
+      <div class="story-grid">
+        {% for post in posts %}
+          <article class="story-card">
+            <a class="story-card-link" href="{{ url_for('posts.detail', post_id=post.id) }}">
+              <div class="story-cover cover-{{ loop.index0 % 4 }}">
+                <span class="cover-label">{{ post.category.name }}</span>
+                <span class="cover-symbol" aria-hidden="true">{{ ['✳', '◒', '✿', '✦'][loop.index0 % 4] }}</span>
+                <span class="cover-index">NO. {{ "%02d"|format(loop.index) }}</span>
+              </div>
+              <div class="story-card-body">
+                <div class="story-meta"><span>{{ post.category.name }}</span><span class="meta-dot">·</span><time datetime="{{ post.created_at.isoformat() }}">{{ post.created_at.strftime("%b %d, %Y") }}</time></div>
+                <h3>{{ post.title }}</h3>
+                <p>{{ post.body|striptags|truncate(145) }}</p>
+                <div class="story-card-bottom"><span class="author-avatar">{{ post.author.name[:1]|upper }}</span><span class="author-name">{{ post.author.name }}</span><span class="read-more">Read story <span aria-hidden="true">↗</span></span></div>
+              </div>
+            </a>
+          </article>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state"><span class="empty-spark">✳</span><h3>No stories found just yet.</h3><p>Try a different search, or be the first to share something.</p>
+        {% if current_user.is_authenticated %}<a class="btn btn-ink" href="{{ url_for('posts.create_post') }}">Write the first story <span aria-hidden="true">↗</span></a>{% else %}<a class="btn btn-ink" href="{{ url_for('auth.register') }}">Join and start writing <span aria-hidden="true">↗</span></a>{% endif %}
+      </div>
+    {% endif %}
+  </div>
+</section>
+<section class="closing-cta"><div class="container closing-inner"><div><span class="eyebrow">YOUR WORDS BELONG HERE</span><h2>Every great story<br>starts <em>somewhere.</em></h2><p>That somewhere could be right here.</p></div><a class="btn btn-cream" href="{{ url_for('posts.create_post') if current_user.is_authenticated else url_for('auth.register') }}">Share your first story <span aria-hidden="true">↗</span></a><span class="closing-star" aria-hidden="true">✳</span></div></section>
+{% endblock %}

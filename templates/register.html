@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<section class="auth-page"><div class="auth-card"><span class="eyebrow">COME ON IN</span><h1>Make a little<br><em>space for you.</em></h1><p class="auth-intro">Create an account to share stories and join the conversation.</p>
+  <form method="post" class="auth-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <label class="form-label" for="name">Your name</label><input class="form-control" id="name" name="name" type="text" maxlength="80" autocomplete="name" required value="{{ request.form.get('name', '') }}" placeholder="What should we call you?">
+    <label class="form-label" for="email">Email address</label><input class="form-control" id="email" name="email" type="email" maxlength="254" autocomplete="email" required value="{{ request.form.get('email', '') }}" placeholder="you@example.com">
+    <label class="form-label" for="password">Password <span class="label-hint">At least 8 characters</span></label><input class="form-control" id="password" name="password" type="password" minlength="8" autocomplete="new-password" required placeholder="Choose a password">
+    <label class="form-label" for="confirm_password">Confirm password</label><input class="form-control" id="confirm_password" name="confirm_password" type="password" minlength="8" autocomplete="new-password" required placeholder="Type it one more time">
+    <button class="btn btn-ink w-100" type="submit">Create your account <span aria-hidden="true">↗</span></button>
+  </form>
+  <p class="auth-switch">Already have an account? <a href="{{ url_for('auth.login') }}">Log in ↗</a></p>
+</div><div class="auth-art register-art" aria-hidden="true"><div class="auth-art-circle"><span>✿</span></div><p>THERE'S A STORY<br>IN ALL OF US.<br><em>WHAT'S YOURS?</em></p></div></section>
+{% endblock %}
